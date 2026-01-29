@@ -1,0 +1,59 @@
+services:
+
+  postgres:
+    image: postgres:14.17
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-admin_password}
+      - POSTGRES_DB=${POSTGRES_DB:-airflow_db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-airflow_db}"]
+      interval: 10s
+      retries: 10
+      timeout: 5s
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./Postgres:/docker-entrypoint-initdb.d/:ro
+      - ./postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - my_network
+
+  airflow:
+    image: apache/airflow:3.0.0
+    container_name: airflow
+    user: "50000:50000" # Standard Airflow user UID:GID - ensures write access to mounted folders
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER:-airflow_user}:${POSTGRES_PASSWORD:-airflow_password}@postgres/${POSTGRES_DB:-airflow_db}
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - WEATHERSTACK_API_KEY=${WEATHERSTACK_API_KEY}
+      - _PIP_ADDITIONAL_REQUIREMENTS=psycopg2-binary requests python-dotenv
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./Airflow/dags:/opt/airflow/dags:rw
+      - ./API_request:/opt/airflow/API_request:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    # This command ensures DB migrations, creates admin user (idempotent), and starts webserver + scheduler
+    command: >
+          bash -c "
+          airflow db upgrade &&
+          airflow users create --username admin --firstname Jack --lastname Sparrow --role Admin --email admin@example.com --password admin || true &&
+          (airflow webserver & airflow scheduler & wait)"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge

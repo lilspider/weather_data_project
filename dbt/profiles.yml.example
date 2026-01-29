@@ -1,0 +1,13 @@
+# Copy to ~/.dbt/profiles.yml or use environment variables
+weather:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'postgres') }}"
+      user: "{{ env_var('POSTGRES_USER', 'airflow_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'airflow_password') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5432') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'airflow_db') }}"
+      schema: analytics
+      threads: 1
