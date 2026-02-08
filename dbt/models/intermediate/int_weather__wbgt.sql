@@ -2,22 +2,13 @@
 -- WBGT formula: 0.7 * (humidity / 100.0 * temp_c) + 0.2 * (temp_c + wind_kph * 0.1) + 0.1 * temp_c
 
 with weather_data as (
-    select
-        city,
-        temperature,
-        humidity,
-        wind_speed,
-        recorded_at
+    select *
     from {{ ref('stg_weatherapi__current') }}
 ),
 
 wbgt_calculated as (
     select
-        city,
-        temperature,
-        humidity,
-        wind_speed,
-        weather_data.recorded_at,
+        *,
         -- WBGT calculation for athlete heat stress monitoring
         (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) as wbgt,
         -- FIFA safety flag classification
