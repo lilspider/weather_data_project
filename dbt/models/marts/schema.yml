@@ -9,8 +9,8 @@ models:
         tests:
           - not_null
           - relationships:
-        to: ref('dim_stadiums')
-          field: stadium_id
+              to: ref('dim_stadiums')
+              field: stadium_id
       - name: stadium_name
         description: "Stadium name from dim_stadiums"
       - name: city
@@ -81,8 +81,8 @@ models:
         tests:
           - not_null
           - relationships:
-        to: ref('dim_stadiums')
-          field: stadium_id
+              to: ref('dim_stadiums')
+              field: stadium_id
       - name: stadium_name
         description: "Stadium name from dim_stadiums"
       - name: city

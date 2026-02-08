@@ -3,7 +3,6 @@ version: '1.0'
 profile: 'weather'
 model-paths: ["models"]
 seed-paths: ["seeds"]
-target-path: "/tmp/dbt_target"
 log-path: "/tmp/dbt_logs"
 clean-targets: ["/tmp/dbt_target"]
 
