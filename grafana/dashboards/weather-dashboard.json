@@ -1,0 +1,673 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#51E5FF",
+                "value": null
+              },
+              {
+                "color": "#0066CC",
+                "value": -10
+              },
+              {
+                "color": "#868E96",
+                "value": 10
+              },
+              {
+                "color": "#FF6B35",
+                "value": 20
+              },
+              {
+                "color": "#C92A2A",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "OpenStreetMap",
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "arrow": {
+                "color": {
+                  "field": "temp",
+                  "fixed": "transparent"
+                },
+                "rotation": {
+                  "field": "wind_dir",
+                  "fixed": 0
+                },
+                "size": {
+                  "field": "wind_speed",
+                  "fixed": 8,
+                  "max": 20,
+                  "min": 4
+                }
+              },
+              "opacity": 0.8,
+              "shape": "arrow"
+            },
+            "location": {
+              "latitude": {
+                "field": "latitude"
+              },
+              "longitude": {
+                "field": "longitude"
+              }
+            },
+            "name": "Cities",
+            "tooltip": [
+              {
+                "field": "city"
+              },
+              {
+                "field": "temp"
+              },
+              {
+                "field": "wind_speed"
+              }
+            ],
+            "type": "markers"
+          }
+        ],
+        "view": {
+          "allLayers": true,
+          "id": "fit",
+          "lat": 0,
+          "lon": 0,
+          "zoom": 2
+        }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "temp",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    city,\n    (json_data::json->'query'->'location'->>'lat')::float as latitude,\n    (json_data::json->'query'->'location'->>'lon')::float as longitude,\n    temperature as temp,\n    (json_data::json->'query'->'current'->>'wind_degree')::int as wind_dir,\n    (json_data::json->'query'->'current'->>'wind_mph')::float as wind_speed,\n    recorded_at as time\nFROM dev.raw_weather_data \nWHERE (city, recorded_at) IN (\n    SELECT city, MAX(recorded_at) FROM dev.raw_weather_data GROUP BY 1\n)\nAND recorded_at >= $__timeFrom() AND recorded_at <= $__timeTo();",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": ["longitude"],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": ["temp"],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": ["wind_dir"],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": ["wind_speed"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "dev.raw_weather_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Live Wind & Temperature Map",
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "calculate": false,
+        "calculation": {
+          "xBuckets": {
+            "mode": "size",
+            "value": 10
+          },
+          "yBuckets": {
+            "mode": "size",
+            "value": 10
+          }
+        },
+        "cellGap": 1,
+        "cellValues": {
+          "decimals": 1
+        },
+        "color": {
+          "exponent": 0.5,
+          "mode": "spectrum",
+          "reverse": false,
+          "scale": "exponential"
+        },
+        "exemplars": {
+          "color": "rgba(255, 0, 255, 0.7)"
+        },
+        "filter": {
+          "case": "ignore",
+          "mode": "exclude",
+          "options": [],
+          "type": "time"
+        },
+        "frame": {
+          "index": 0,
+          "name": "Time"
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none",
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false,
+          "unit": "short"
+        }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "temperature",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    recorded_at as time,\n    city,\n    temperature\nFROM dev.stg_weather_data\nWHERE city IN ($city)\n  AND recorded_at >= $__timeFrom() AND recorded_at <= $__timeTo()\nORDER BY 1, 2;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["temperature"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "dev.stg_weather_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Temperature Heatmap (24H)",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "temperature",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    AVG(temperature) as value,\n    recorded_at as time\nFROM dev.stg_weather_data\nWHERE recorded_at >= $__timeFrom() AND recorded_at <= $__timeTo()\nGROUP BY time\nORDER BY time;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["value"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "dev.stg_weather_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Global Avg Temp",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "wind_speed",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    city,\n    wind_speed as value,\n    recorded_at as time\nFROM dev.stg_weather_data\nWHERE recorded_at >= $__timeFrom() AND recorded_at <= $__timeTo()\nORDER BY time, city;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["value"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "dev.stg_weather_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Wind Speed by City",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#51E5FF",
+                "value": null
+              },
+              {
+                "color": "#0066CC",
+                "value": -10
+              },
+              {
+                "color": "#868E96",
+                "value": 10
+              },
+              {
+                "color": "#FF6B35",
+                "value": 20
+              },
+              {
+                "color": "#C92A2A",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "temperature",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    city as metric,\n    temperature as value,\n    recorded_at as time\nFROM dev.stg_weather_data\nWHERE recorded_at = (SELECT MAX(recorded_at) FROM dev.stg_weather_data)\nORDER BY temperature;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["value"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "dev.stg_weather_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Current City Temperatures",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [
+    "weather",
+    "monitoring"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres"
+        },
+        "definition": "SELECT DISTINCT city FROM dev.stg_weather_data",
+        "hide": 0,
+        "includeAll": true,
+        "label": "City",
+        "multi": true,
+        "name": "city",
+        "options": [],
+        "query": "SELECT DISTINCT city FROM dev.stg_weather_data",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Weather Monitoring Dashboard",
+  "uid": "weather-dashboard",
+  "version": 1,
+  "weekStart": ""
+}

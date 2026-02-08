@@ -1,4 +1,4 @@
--- Mart: daily average temperature per city (rounded)
+-- Daily average temperature per city
 with base as (
     select
         city,

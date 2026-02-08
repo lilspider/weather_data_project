@@ -13,6 +13,7 @@ __pycache__/
 
 # Docker
 postgres_data/
+grafana_data/
 docker-compose.override.yml
 
 # Editor configs
@@ -20,5 +21,18 @@ docker-compose.override.yml
 .idea/
 .DS_Store
 
-# Misc
+# Logs and data
 *.log
+airflow_logs/
+*.db
+*.sqlite
+
+# Grafana
+grafana_data/png/
+grafana_data/csv/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml

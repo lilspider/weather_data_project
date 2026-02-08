@@ -1,0 +1,180 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "your-postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#51E5FF",
+                "value": null
+              },
+              {
+                "color": "#0066CC",
+                "value": -10
+              },
+              {
+                "color": "#868E96",
+                "value": 10
+              },
+              {
+                "color": "#FF6B35",
+                "value": 20
+              },
+              {
+                "color": "#C92A2A",
+                "value": 30
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "OpenStreetMap",
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "opacity": 0.8,
+              "shape": "circle"
+            },
+            "location": {
+              "latitude": {
+                "field": "latitude"
+              },
+              "longitude": {
+                "field": "longitude"
+              }
+            },
+            "name": "Cities",
+            "tooltip": [
+              {
+                "field": "city"
+              },
+              {
+                "field": "temp"
+              }
+            ],
+            "type": "markers"
+          }
+        ],
+        "view": {
+          "allLayers": true,
+          "id": "fit",
+          "lat": 0,
+          "lon": 0,
+          "zoom": 2
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "your-postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    city,\n    (json_data::json->'query'->'location'->>'lat')::float as latitude,\n    (json_data::json->'query'->'location'->>'lon')::float as longitude,\n    temperature as temp,\n    recorded_at as time\nFROM dev.raw_weather_data \nWHERE recorded_at >= NOW() - INTERVAL '1 hour'\nORDER BY recorded_at DESC;",
+          "refId": "A",
+          "table": "dev.raw_weather_data",
+          "timeColumn": "time"
+        }
+      ],
+      "title": "Weather Map",
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "your-postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "showValue": "always",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "your-postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    city as metric,\n    temperature as value,\n    recorded_at as time\nFROM dev.stg_weather_data\nWHERE recorded_at >= NOW() - INTERVAL '24 hours'\nORDER BY time;",
+          "refId": "A",
+          "table": "dev.stg_weather_data",
+          "timeColumn": "time"
+        }
+      ],
+      "title": "Current Temperatures",
+      "type": "stat"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [
+    "weather"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Weather Dashboard",
+  "uid": "weather-simple",
+  "version": 1
+}

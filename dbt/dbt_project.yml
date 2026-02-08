@@ -1,15 +1,9 @@
 name: 'weather_dbt'
 version: '1.0'
 profile: 'weather'
-source-paths: ["models"]
 model-paths: ["models"]
-analysis-paths: ["analysis"]
-test-paths: ["tests"]
-macro-paths: ["macros"]
-target-path: "target"
-clean-targets:
-  - "target"
-  - "dbt_modules"
+target-path: "/tmp/dbt_target"
+clean-targets: ["/tmp/dbt_target"]
 
 models:
   weather_dbt:

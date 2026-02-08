@@ -35,6 +35,8 @@ Phase 3 - dbt
   - `models/staging/stg_weather_data.sql`
   - `models/marts/daily_average.sql`
 
+Docker images: we use slimmer variants where possible to speed up image pulls and reduce disk usage, e.g. `postgres:14-alpine` and `apache/airflow:3.0.0-python3.12-slim`. If these images fail to pull in your environment, try the full tags (e.g., `postgres:14.17` or `apache/airflow:3.0.0`).
+
 Phase 4 - Visualization
 - Placeholder config for Superset is in `docker/superset_config.py` and `docker/dockerinit.sh` to add init commands.
 

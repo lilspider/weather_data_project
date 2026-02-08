@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: ./scripts/fix_postgres_perms.sh [HOST_UID HOST_GID]
-# Example: ./scripts/fix_postgres_perms.sh 1000 1000
 
 HOST_UID=${1:-999}
 HOST_GID=${2:-999}
