@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: stg_weatherapi__current
+    description: "Current weather conditions from WeatherAPI.com with comprehensive field extraction"
+    columns:
+      - name: id
+        description: "Primary key from raw_weather_data"
+        tests:
+          - not_null
+      - name: city
+        description: "City name"
+        tests:
+          - not_null
+          - unique
+      - name: temperature
+        description: "Temperature in Celsius"
+        tests:
+          - not_null
+      - name: humidity
+        description: "Humidity percentage"
+      - name: wind_speed
+        description: "Wind speed in km/h"
+      - name: wind_dir
+        description: "Wind direction in degrees"
+      - name: precip_mm
+        description: "Precipitation in millimeters"
+      - name: cloud
+        description: "Cloud coverage percentage"
+      - name: uv
+        description: "UV index"
+      - name: feelslike_c
+        description: "Feels like temperature in Celsius"
+      - name: dewpoint_c
+        description: "Dew point in Celsius"
+      - name: pressure_mb
+        description: "Pressure in millibars"
+      - name: vis_km
+        description: "Visibility in kilometers"
+      - name: weather_description
+        description: "Weather condition description"
+        tests:
+          - not_null
+      - name: recorded_at
+        description: "Timestamp of weather reading"
+        tests:
+          - not_null
+
+  - name: stg_weatherapi__forecast
+    description: "Weather forecast data (placeholder for future implementation)"
+    columns:
+      - name: city
+        description: "City name"
+      - name: forecast_date
+        description: "Date of forecast"
+      - name: forecast_temp_c
+        description: "Forecasted temperature in Celsius"
+      - name: forecast_condition
+        description: "Forecasted weather condition"
+      - name: created_at
+        description: "Timestamp when forecast was created"

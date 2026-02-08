@@ -4,7 +4,7 @@ with base as (
         city,
         recorded_at::date as day,
         temperature::numeric as temperature
-    from {{ ref('stg_weather_data') }}
+    from {{ ref('stg_weatherapi__current') }}
 )
 select
     city,

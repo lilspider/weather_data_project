@@ -2,6 +2,7 @@ name: 'weather_dbt'
 version: '1.0'
 profile: 'weather'
 model-paths: ["models"]
+seed-paths: ["seeds"]
 target-path: "/tmp/dbt_target"
 clean-targets: ["/tmp/dbt_target"]
 
@@ -11,3 +12,7 @@ models:
       +materialized: view
     marts:
       +materialized: table
+
+seeds:
+  weather_dbt:
+    +schema: analytics

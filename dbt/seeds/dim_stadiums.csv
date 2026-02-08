@@ -1,0 +1,16 @@
+stadium_id,stadium_name,city,country,lat,lon,elevation_m,capacity,grass_type,has_roof
+1,MetLife Stadium,East Rutherford,USA,40.8128,-74.0742,2,82500,Artificial,No
+2,SoFi Stadium,Inglewood,USA,33.9535,-118.3392,30,70240,Artificial,Yes
+3,Estadio Azteca,Mexico City,Mexico,19.3029,-99.1505,2240,87523,Natural (Bermuda),No
+4,BMO Field,Toronto,Canada,43.6332,-79.4186,77,30000,Natural (Kentucky Bluegrass),No
+5,AT&T Stadium,Arlington,USA,32.7473,-97.0945,182,80000,Artificial,Yes
+6,NRG Stadium,Houston,USA,29.6847,-95.4107,15,72220,Artificial,Yes
+7,Lumen Field,Seattle,USA,47.5952,-122.3316,5,68740,Artificial,No
+8,Levi's Stadium,Santa Clara,USA,37.4033,-121.9694,26,68500,Natural (Bermuda),No
+9,Lincoln Financial Field,Philadelphia,USA,39.9008,-75.1675,5,69796,Natural,No
+10,Mercedes-Benz Stadium,Atlanta,USA,33.7554,-84.4010,320,71000,Artificial,Yes
+11,Arrowhead Stadium,Kansas City,USA,39.0489,-94.4839,310,76416,Natural,No
+12,Estadio BBVA,Monterrey,Mexico,25.6701,-100.2440,500,53500,Natural (Bermuda),No
+13,Estadio Akron,Guadalajara,Mexico,20.6821,-103.4625,1560,49850,Natural,No
+14,BC Place,Vancouver,Canada,49.2768,-123.1120,10,54500,Artificial,No
+15,Hard Rock Stadium,Miami Gardens,USA,25.958,-80.2389,2,64767,Natural (Bermuda),No
