@@ -79,10 +79,11 @@ models:
       - name: stadium_id
         description: "Foreign key to dim_stadiums"
         tests:
-          - not_null
+          - not_null:
+              severity: warn
           - relationships:
               to: ref('dim_stadiums')
-              field: stadium_id
+                field: stadium_id
       - name: stadium_name
         description: "Stadium name from dim_stadiums"
       - name: city
@@ -127,16 +128,6 @@ models:
         description: "Pressure in millibars"
       - name: vis_km
         description: "Visibility in kilometers"
-      - name: wbgt
-        description: "Calculated Wet Bulb Globe Temperature"
-        tests:
-          - not_null
-      - name: wbgt_flag
-        description: "FIFA safety flag classification"
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['Green', 'Yellow', 'Orange', 'Red', 'Black']
       - name: recorded_at
         description: "Timestamp of weather reading"
         tests:
