@@ -1,33 +1,37 @@
 -- Intermediate: Calculate Wet Bulb Globe Temperature (WBGT) for athlete safety monitoring
--- WBGT formula: 0.7 * (humidity / 100.0 * temp_c) + 0.2 * (temp_c + wind_kph * 0.1) + 0.1 * temp_c
+-- Passes through all staging columns + adds calculated wbgt and wbgt_flag
 
-with weather_data as (
-    select *
-    from {{ ref('stg_weatherapi__current') }}
-),
-
-wbgt_calculated as (
-    select
-        *,
-        -- WBGT calculation for athlete heat stress monitoring
-        (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) as wbgt,
-        -- FIFA safety flag classification
-        case 
-            when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) < 25.6 then 'Green'
-            when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) between 25.6 and 27.7 then 'Yellow'
-            when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) between 27.8 and 29.3 then 'Orange'
-            when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) between 29.4 and 31.0 then 'Red'
-            else 'Black'
-        end as wbgt_flag
-    from weather_data
-)
-
-select 
+select
+    id,
     city,
     temperature,
     humidity,
     wind_speed,
-    wbgt,
-    wbgt_flag,
-    recorded_at
-from wbgt_calculated
+    wind_dir,
+    precip_mm,
+    cloud,
+    uv,
+    feelslike_c,
+    dewpoint_c,
+    pressure_mb,
+    vis_km,
+    weather_description,
+    recorded_at,
+
+    -- WBGT approximation
+    round(
+        (0.7 * (humidity / 100.0 * temperature)
+       + 0.2 * (temperature + wind_speed * 0.1)
+       + 0.1 * temperature)::numeric
+    , 2) as wbgt,
+
+    -- FIFA safety flag
+    case
+        when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) < 25.6 then 'Green'
+        when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) <= 27.7 then 'Yellow'
+        when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) <= 29.3 then 'Orange'
+        when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) <= 31.0 then 'Red'
+        else 'Black'
+    end as wbgt_flag
+
+from {{ ref('stg_weatherapi__current') }}
