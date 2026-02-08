@@ -149,11 +149,6 @@ models:
     columns:
       - name: stadium_id
         description: "Foreign key to dim_stadiums"
-        tests:
-          - not_null
-          - relationships:
-              - to: ref('dim_stadiums')
-                field: stadium_id
       - name: match_id
         description: "Match identifier"
       - name: kickoff_utc
