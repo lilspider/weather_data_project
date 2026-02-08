@@ -55,7 +55,5 @@ select
     w.dewpoint_c,
     w.pressure_mb,
     w.vis_km,
-    w.wbgt,
-    w.wbgt_flag,
     w.recorded_at
 from weather_with_stadium w
