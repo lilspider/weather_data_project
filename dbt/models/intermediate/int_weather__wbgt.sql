@@ -39,5 +39,5 @@ select
     wind_speed,
     wbgt,
     wbgt_flag,
-    weather_data.recorded_at
+    recorded_at
 from wbgt_calculated
