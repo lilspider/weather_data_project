@@ -11,7 +11,7 @@ def _get_dbt_env():
     """Get dbt environment from Docker container."""
     env = os.environ.copy()
     env.update({
-        'DBT_LOG_PATH': '/tmp/dbt.log',
+        'DBT_LOG_PATH': '/tmp/dbt_logs',
         'DBT_TARGET_PATH': '/tmp/dbt_target'
     })
     return env
