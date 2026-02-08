@@ -28,5 +28,5 @@ select
     w.recorded_at
 from {{ ref('stg_weatherapi__current') }}  w
 left join {{ ref('dim_stadiums') }}  s
-    on round(w.lat::numeric, 2) = round(s.lat::numeric, 2)
-    and round(w.lon::numeric, 2) = round(s.lon::numeric, 2)
+    on round(w.lat::numeric, 1) = round(s.lat::numeric, 1)
+    and round(w.lon::numeric, 1) = round(s.lon::numeric, 1)
