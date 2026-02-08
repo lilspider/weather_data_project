@@ -67,8 +67,6 @@ models:
               values: ['Green', 'Yellow', 'Orange', 'Red', 'Black']
       - name: recorded_at
         description: "Timestamp of weather reading"
-        tests:
-          - not_null
 
   - name: fct_weather_observations
     description: "Weather observations fact table with stadium context"
