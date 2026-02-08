@@ -14,9 +14,6 @@ from API_request.insert_records import insert_bulk_weather_data
 from API_request.weather_api_client import fetch_bulk_weather
 from dbt_orchestrator import run_staging_models, run_mart_models, run_intermediate_models
 
-# Read weather mode from Airflow Variables
-WEATHER_MODE = Variable.get("weather_mode", default_var="standard")
-
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -24,6 +21,11 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
+
+@task
+def get_weather_mode():
+    """Get current weather mode from Airflow Variables."""
+    return Variable.get("weather_mode", default_var="standard")
 
 @task
 def fetch_bulk_weather_task():
@@ -56,12 +58,15 @@ def run_marts():
 @dag(
     dag_id='weather_ingestion_dag',
     default_args=default_args,
-    description=f'FIFA World Cup Weather Pipeline - Current mode: {WEATHER_MODE}',
-    schedule_interval=timedelta(minutes=5) if WEATHER_MODE == "live_match" else timedelta(minutes=55),
+    description='FIFA World Cup Weather Pipeline - Dynamic scheduling based on match periods',
+    schedule_interval='@hourly',  # Default schedule, will be updated by controller
     catchup=False,
     tags=['fifa', 'weather', 'worldcup'],
 ) as dag:
 
+    # Get weather mode dynamically
+    weather_mode = get_weather_mode()
+    
     # Single bulk weather fetch task
     bulk_fetch = fetch_bulk_weather_task()
     
@@ -70,5 +75,5 @@ def run_marts():
     intermediate = run_intermediate()
     marts = run_marts()
 
-    # Set dependencies: bulk fetch -> staging -> intermediate -> marts
-    bulk_fetch >> staging >> intermediate >> marts
+    # Set dependencies: weather_mode -> bulk fetch -> staging -> intermediate -> marts
+    weather_mode >> bulk_fetch >> staging >> intermediate >> marts
