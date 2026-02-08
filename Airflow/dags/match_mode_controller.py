@@ -57,7 +57,7 @@ def check_match_periods():
         logger.info("Weather mode set to: standard (55-minute intervals)")
         return "Switched to standard mode"
 
-@dag(
+with DAG(
     dag_id='match_mode_controller',
     default_args=default_args,
     description='FIFA 2026 Match Mode Controller - Switches weather mode during live matches',
@@ -65,6 +65,5 @@ def check_match_periods():
     catchup=False,
     tags=['fifa', 'controller', 'weather'],
 ) as dag:
-    
-    # Single task to check match periods and update weather mode
+
     mode_check = check_match_periods()
