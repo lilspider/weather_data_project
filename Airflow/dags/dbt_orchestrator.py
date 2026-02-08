@@ -1,5 +1,5 @@
 """
-Production-ready dbt Orchestrator for Weather Data Project
+dbt Orchestrator for FIFA 2026 Weather Data Project
 """
 import os
 import subprocess
@@ -7,8 +7,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+DBT_DIR = '/opt/airflow/dbt'
+
 def _get_dbt_env():
-    """Get dbt environment from Docker container."""
+    """Get dbt environment with correct paths."""
     env = os.environ.copy()
     env.update({
         'DBT_LOG_PATH': '/tmp/dbt_logs',
@@ -16,49 +18,53 @@ def _get_dbt_env():
     })
     return env
 
-def run_intermediate_models():
-    """Run intermediate models."""
+def _run_dbt(select_target):
+    """Run dbt for a given target (staging, intermediate, marts, etc.)."""
     env = _get_dbt_env()
-    command = ['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'intermediate']
-    
+    command = [
+        'dbt', 'run',
+        '--profiles-dir', DBT_DIR,
+        '--project-dir', '.',
+        '--select', select_target
+    ]
+
     result = subprocess.run(
         command,
         env=env,
         capture_output=True,
         text=True,
         timeout=300,
-        cwd='/opt/airflow/dbt'
+        cwd=DBT_DIR
     )
-    
+
     if result.returncode != 0:
-        raise Exception(f"dbt failed: {result.stderr}")
-    
+        raise Exception(f"dbt {select_target} failed: {result.stderr}")
+
+    logger.info(f"dbt {select_target} completed: {result.stdout}")
     return result.stdout
+
+def run_staging_models():
+    """Run staging models."""
+    return _run_dbt('staging')
+
+def run_intermediate_models():
+    """Run intermediate models."""
+    return _run_dbt('intermediate')
 
 def run_mart_models():
     """Run mart models."""
-    env = _get_dbt_env()
-    command = ['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'marts']
-    
-    result = subprocess.run(
-        command,
-        env=env,
-        capture_output=True,
-        text=True,
-        timeout=300,
-        cwd='/opt/airflow/dbt'
-    )
-    
-    if result.returncode != 0:
-        raise Exception(f"dbt failed: {result.stderr}")
-    
-    return result.stdout
+    return _run_dbt('marts')
 
 def run_full_pipeline():
-    """Run complete dbt pipeline: staging -> intermediate -> marts."""
+    """Run complete dbt pipeline: deps -> staging -> intermediate -> marts."""
     env = _get_dbt_env()
-    
-    subprocess.run(['dbt', 'deps', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.'], env=env, timeout=300, cwd='/opt/airflow/dbt')
-    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'staging'], env=env, timeout=300, cwd='/opt/airflow/dbt')
-    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'intermediate'], env=env, timeout=300, cwd='/opt/airflow/dbt')
-    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'marts'], env=env, timeout=300, cwd='/opt/airflow/dbt')
+    result = subprocess.run(
+        ['dbt', 'deps', '--profiles-dir', DBT_DIR, '--project-dir', '.'],
+        env=env, capture_output=True, text=True, timeout=300, cwd=DBT_DIR
+    )
+    if result.returncode != 0:
+        raise Exception(f"dbt deps failed: {result.stderr}")
+
+    _run_dbt('staging')
+    _run_dbt('intermediate')
+    _run_dbt('marts')
