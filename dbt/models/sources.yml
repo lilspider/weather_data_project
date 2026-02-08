@@ -9,5 +9,5 @@ sources:
         description: "Raw weather data from WeatherAPI.com bulk API"
         loaded_at_field: recorded_at
         freshness:
-          warn_after: {count: 2, period: minute}
-          error_after: {count: 6, period: minute}
+          warn_after: {count: 120, period: minute}
+          error_after: {count: 360, period: minute}
