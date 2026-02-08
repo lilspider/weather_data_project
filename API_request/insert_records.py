@@ -7,20 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def insert_raw_weather(city: str, temperature, weather_descriptions: str):
-    """Insert raw weather data with idempotency."""
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO dev.raw_weather_data (city, temperature, weather_descriptions, recorded_at)
-                VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
-                ON CONFLICT (city, recorded_at) DO NOTHING
-                """,
-                (city, temperature, weather_descriptions),
-            )
-            conn.commit()
-
 def insert_bulk_weather_data(bulk_data):
     """Insert bulk weather data from WeatherAPI.com response."""
     with get_connection() as conn:
