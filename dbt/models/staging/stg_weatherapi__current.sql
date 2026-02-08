@@ -60,27 +60,26 @@ with src as (
             else null
         end as vis_km,
         
+        case
+            when json_data is not null then (json_data->'query'->'location'->>'lat')::numeric
+            else null
+        end as lat,
+
+        case
+            when json_data is not null then (json_data->'query'->'location'->>'lon')::numeric
+            else null
+        end as lon,
+        
         case 
             when json_data is not null then json_data->'query'->'current'->'condition'->>'text'
             else weather_descriptions
         end as weather_description,
         
-        -- Extract stadium coordinates for precise matching
-        case 
-            when json_data is not null then (json_data->'query'->'location'->>'lat')::numeric
-            else null
-        end as lat,
-        
-        case 
-            when json_data is not null then (json_data->'query'->'location'->>'lon')::numeric
-            else null
-        end as lon,
-        
         recorded_at,
         date_trunc('hour', recorded_at) as hour_bucket,
         recorded_at::date as date_bucket,
         json_data
-    from dev.raw_weather_data
+    from {{ source('weatherapi', 'raw_weather_data') }}
 ), ranked as (
     select *, row_number() over (partition by city, hour_bucket order by recorded_at desc, id desc) as rn
     from src
