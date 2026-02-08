@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: int_weather__wbgt
+    description: "Calculate Wet Bulb Globe Temperature (WBGT) for athlete safety monitoring"
+    columns:
+      - name: city
+        description: "City name"
+        tests:
+          - not_null
+      - name: temperature
+        description: "Temperature in Celsius"
+        tests:
+          - not_null
+      - name: humidity
+        description: "Humidity percentage"
+        tests:
+          - not_null
+      - name: wind_speed
+        description: "Wind speed in km/h"
+        tests:
+          - not_null
+      - name: wbgt
+        description: "Calculated Wet Bulb Globe Temperature"
+        tests:
+          - not_null
+      - name: wbgt_flag
+        description: "FIFA safety flag classification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Green', 'Yellow', 'Orange', 'Red', 'Black']
+      - name: recorded_at
+        description: "Timestamp of weather reading"
+        tests:
+          - not_null

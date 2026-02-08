@@ -10,8 +10,13 @@ models:
   weather_dbt:
     staging:
       +materialized: view
+      +tags: ['worldcup']
+    intermediate:
+      +materialized: view
+      +tags: ['worldcup', 'live']
     marts:
       +materialized: table
+      +tags: ['worldcup']
 
 seeds:
   weather_dbt:

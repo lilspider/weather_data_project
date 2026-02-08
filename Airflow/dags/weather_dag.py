@@ -11,7 +11,7 @@ sys.path.append('/opt/airflow')
 
 from API_request.insert_records import insert_bulk_weather_data
 from API_request.weather_api_client import fetch_bulk_weather
-from dbt_orchestrator import run_staging_models, run_mart_models
+from dbt_orchestrator import run_staging_models, run_mart_models, run_intermediate_models
 
 @task
 def fetch_bulk_weather_task():
@@ -30,6 +30,11 @@ def fetch_bulk_weather_task():
 def run_staging():
     """Run staging models."""
     return run_staging_models()
+
+@task
+def run_intermediate():
+    """Run intermediate models for FIFA athlete safety monitoring."""
+    return run_intermediate_models()
 
 @task
 def run_marts():
@@ -57,7 +62,8 @@ with DAG(
     
     # dbt transformation tasks
     staging = run_staging()
+    intermediate = run_intermediate()
     marts = run_marts()
 
-    # Set dependencies: bulk fetch -> staging -> marts
-    bulk_fetch >> staging >> marts
+    # Set dependencies: bulk fetch -> staging -> intermediate -> marts
+    bulk_fetch >> staging >> intermediate >> marts

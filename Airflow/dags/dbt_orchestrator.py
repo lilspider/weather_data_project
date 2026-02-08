@@ -16,10 +16,10 @@ def _get_dbt_env():
     })
     return env
 
-def run_staging_models():
-    """Run staging models."""
+def run_intermediate_models():
+    """Run intermediate models."""
     env = _get_dbt_env()
-    command = ['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'staging']
+    command = ['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'intermediate']
     
     result = subprocess.run(
         command,
@@ -55,8 +55,10 @@ def run_mart_models():
     return result.stdout
 
 def run_full_pipeline():
-    """Run complete dbt pipeline."""
+    """Run complete dbt pipeline: staging -> intermediate -> marts."""
     env = _get_dbt_env()
     
     subprocess.run(['dbt', 'deps', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.'], env=env, timeout=300, cwd='/opt/airflow/dbt')
-    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.'], env=env, timeout=300, cwd='/opt/airflow/dbt')
+    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'staging'], env=env, timeout=300, cwd='/opt/airflow/dbt')
+    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'intermediate'], env=env, timeout=300, cwd='/opt/airflow/dbt')
+    subprocess.run(['dbt', 'run', '--profiles-dir', '/opt/airflow/dbt', '--project-dir', '.', '--select', 'marts'], env=env, timeout=300, cwd='/opt/airflow/dbt')
