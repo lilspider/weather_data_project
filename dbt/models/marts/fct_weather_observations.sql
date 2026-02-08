@@ -15,8 +15,6 @@ with weather_with_stadium as (
         w.dewpoint_c,
         w.pressure_mb,
         w.vis_km,
-        w.wbgt,
-        w.wbgt_flag,
         w.recorded_at,
         s.stadium_id,
         s.stadium_name,
@@ -33,7 +31,6 @@ with weather_with_stadium as (
 )
 
 select 
-    w.id as weather_observation_id,
     s.stadium_id,
     s.stadium_name,
     w.city,

@@ -17,7 +17,7 @@ wbgt_calculated as (
         temperature,
         humidity,
         wind_speed,
-        recorded_at,
+        weather_data.recorded_at,
         -- WBGT calculation for athlete heat stress monitoring
         (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) as wbgt,
         -- FIFA safety flag classification
@@ -27,8 +27,7 @@ wbgt_calculated as (
             when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) between 27.8 and 29.3 then 'Orange'
             when (0.7 * (humidity / 100.0 * temperature) + 0.2 * (temperature + wind_speed * 0.1) + 0.1 * temperature) between 29.4 and 31.0 then 'Red'
             else 'Black'
-        end as wbgt_flag,
-        recorded_at
+        end as wbgt_flag
     from weather_data
 )
 
