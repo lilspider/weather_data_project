@@ -10,3 +10,12 @@ providers:
     allowUiUpdates: true
     options:
       path: /var/lib/grafana/dashboards
+  - name: 'athlete-safety'
+    orgId: 1
+    folder: 'FIFA 2026'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

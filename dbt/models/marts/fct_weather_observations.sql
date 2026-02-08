@@ -28,7 +28,9 @@ with weather_with_stadium as (
         s.grass_type,
         s.has_roof
     from {{ ref('stg_weatherapi__current') }} w
-    left join {{ ref('dim_stadiums') }} s on w.city = s.city
+    left join {{ ref('dim_stadiums') }} s on 
+        round(w.lat::numeric, 2) = round(s.lat::numeric, 2)
+        AND round(w.lon::numeric, 2) = round(s.lon::numeric, 2)
 )
 
 select 

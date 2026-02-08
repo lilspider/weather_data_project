@@ -65,6 +65,17 @@ with src as (
             else weather_descriptions
         end as weather_description,
         
+        -- Extract stadium coordinates for precise matching
+        case 
+            when json_data is not null then (json_data->'query'->'location'->>'lat')::numeric
+            else null
+        end as lat,
+        
+        case 
+            when json_data is not null then (json_data->'query'->'location'->>'lon')::numeric
+            else null
+        end as lon,
+        
         recorded_at,
         date_trunc('hour', recorded_at) as hour_bucket,
         recorded_at::date as date_bucket,
@@ -89,6 +100,8 @@ select
     pressure_mb,
     vis_km,
     weather_description,
+    lat,
+    lon,
     recorded_at
 from ranked
 where rn = 1

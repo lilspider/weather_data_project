@@ -16,6 +16,8 @@ select
     pressure_mb,
     vis_km,
     weather_description,
+    lat,
+    lon,
     recorded_at,
 
     -- WBGT approximation
