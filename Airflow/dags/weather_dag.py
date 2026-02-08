@@ -1,9 +1,9 @@
 """
 Weather Data Pipeline DAG - WeatherAPI.com Bulk Request
+Supports dual-mode: standard (55min) and live_match (5min)
 """
 from airflow import DAG
 from airflow.decorators import task
-from airflow.models.variable import Variable
 from datetime import datetime, timedelta
 import sys
 import os
@@ -22,21 +22,19 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-@task
-def get_weather_mode():
-    """Get current weather mode from Airflow Variables."""
+def _get_weather_mode():
+    """Read weather mode at runtime, not parse time."""
+    from airflow.models.variable import Variable
     return Variable.get("weather_mode", default_var="standard")
 
 @task
 def fetch_bulk_weather_task():
-    """Fetch bulk weather data for all cities using WeatherAPI.com."""
+    """Fetch bulk weather data for all FIFA 2026 stadiums."""
     bulk_data = fetch_bulk_weather()
-    
-    # Extract the bulk locations array from the response
     if 'bulk' in bulk_data:
         locations = bulk_data['bulk']
         insert_bulk_weather_data(bulk_data)
-        return f"Successfully processed {len(locations)} cities"
+        return f"Successfully processed {len(locations)} stadiums"
     else:
         raise ValueError("Unexpected response format from WeatherAPI.com")
 
@@ -55,25 +53,20 @@ def run_marts():
     """Run mart models."""
     return run_mart_models()
 
-@dag(
+# Use standard schedule — the match_mode_controller DAG handles switching
+# by triggering this DAG more frequently during live matches
+with DAG(
     dag_id='weather_ingestion_dag',
     default_args=default_args,
-    description='FIFA World Cup Weather Pipeline - Dynamic scheduling based on match periods',
-    schedule_interval='@hourly',  # Default schedule, will be updated by controller
+    description='FIFA 2026 World Cup Weather Pipeline',
+    schedule_interval=timedelta(minutes=55),
     catchup=False,
     tags=['fifa', 'weather', 'worldcup'],
 ) as dag:
 
-    # Get weather mode dynamically
-    weather_mode = get_weather_mode()
-    
-    # Single bulk weather fetch task
     bulk_fetch = fetch_bulk_weather_task()
-    
-    # dbt transformation tasks
     staging = run_staging()
     intermediate = run_intermediate()
     marts = run_marts()
 
-    # Set dependencies: weather_mode -> bulk fetch -> staging -> intermediate -> marts
-    weather_mode >> bulk_fetch >> staging >> intermediate >> marts
+    bulk_fetch >> staging >> intermediate >> marts
