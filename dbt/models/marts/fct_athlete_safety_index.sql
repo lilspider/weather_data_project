@@ -7,7 +7,6 @@ with weather_with_stadium as (
         w.temperature,
         w.humidity,
         w.wind_speed,
-        w.precip_mm,
         w.cloud,
         w.uv,
         w.feelslike_c,
